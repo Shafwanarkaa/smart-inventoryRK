@@ -1,0 +1,95 @@
+@extends('layouts.app')
+
+@section('title', 'Kategori')
+@section('page-title', 'Kategori')
+@section('page-subtitle', 'Kelola data kategori bahan baku.')
+
+@section('sidebar')
+<a href="{{ route('manajer.dashboard') }}" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg mb-1 transition text-gray-600">
+    <i class="fas fa-home w-5"></i>
+    <span class="font-medium">Dashboard</span>
+</a>
+<a href="{{ route('manajer.bahan-baku.index') }}" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg mb-1 transition text-gray-600">
+    <i class="fas fa-box w-5"></i>
+    <span class="font-medium">Bahan Baku</span>
+</a>
+<a href="{{ route('manajer.kategori.index') }}" class="sidebar-link sidebar-active flex items-center space-x-3 px-4 py-3 rounded-lg mb-1 transition">
+    <i class="fas fa-tags w-5"></i>
+    <span class="font-medium">Kategori</span>
+</a>
+<a href="{{ route('manajer.supplier.index') }}" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg mb-1 transition text-gray-600">
+    <i class="fas fa-truck w-5"></i>
+    <span class="font-medium">Supplier</span>
+</a>
+@endsection
+
+@section('content')
+
+<!-- Action Button -->
+<div class="mb-6">
+    <a href="{{ route('manajer.kategori.create') }}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold rounded-lg hover:from-emerald-600 hover:to-teal-600 transition-all shadow-lg hover:shadow-xl">
+        <i class="fas fa-plus mr-2"></i>Tambah Kategori
+    </a>
+</div>
+
+<!-- Table Kategori -->
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+
+    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+        <h3 class="text-lg font-bold text-gray-800">
+            <i class="fas fa-list mr-2 text-emerald-600"></i>Daftar Kategori
+        </h3>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">No</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Nama Kategori</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Jumlah Bahan</th>
+                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                @forelse($kategoris as $index => $kategori)
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4 text-gray-600">{{ $index + 1 }}</td>
+                    <td class="px-6 py-4">
+                        <span class="font-semibold text-gray-800">{{ $kategori->nama_kategori }}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-semibold rounded-full">
+                            {{ $kategori->bahan_bakus_count }} item
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <div class="flex items-center justify-center space-x-2">
+                            <a href="{{ route('manajer.kategori.edit', $kategori->id) }}" class="px-3 py-1.5 bg-blue-500 text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form action="{{ route('manajer.kategori.destroy', $kategori->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus kategori ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="px-3 py-1.5 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 transition">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="4" class="px-6 py-8 text-center text-gray-500">
+                        <i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i>
+                        <p>Belum ada data kategori.</p>
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+@endsection
