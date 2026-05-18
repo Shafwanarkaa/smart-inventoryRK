@@ -13,6 +13,14 @@
     <i class="fas fa-box w-5"></i>
     <span class="font-medium">Bahan Baku</span>
 </a>
+<a href="{{ route('manajer.ranking-saw') }}" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg mb-1 transition text-gray-600">
+    <i class="fas fa-trophy w-5"></i>
+    <span class="font-medium">Ranking SAW</span>
+</a>
+<a href="{{ route('manajer.peringatan-stok') }}" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg mb-1 transition text-gray-600">
+    <i class="fas fa-exclamation-triangle w-5"></i>
+    <span class="font-medium">Peringatan Stok</span>
+</a>
 <a href="{{ route('manajer.kategori.index') }}" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg mb-1 transition text-gray-600">
     <i class="fas fa-tags w-5"></i>
     <span class="font-medium">Kategori</span>
@@ -32,6 +40,72 @@
     </a>
 </div>
 
+<!-- Filter & Search -->
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+    <form method="GET" action="{{ route('manajer.bahan-baku.index') }}" class="flex flex-col md:flex-row gap-4">
+        
+        <!-- Search Box -->
+        <div class="flex-1">
+            <div class="relative">
+                <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input 
+                    type="text" 
+                    name="search" 
+                    class="w-full pl-11 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
+                    placeholder="Cari nama bahan, kategori, atau supplier..."
+                    value="{{ request('search') }}"
+                >
+            </div>
+        </div>
+        
+        <!-- Filter Kategori -->
+        <div class="md:w-64">
+            <select 
+                name="kategori_id" 
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
+                onchange="this.form.submit()"
+            >
+                <option value="">📁 Semua Kategori</option>
+                @foreach($kategoris as $kategori)
+                <option value="{{ $kategori->id }}" {{ request('kategori_id') == $kategori->id ? 'selected' : '' }}>
+                    {{ $kategori->nama_kategori }}
+                </option>
+                @endforeach
+            </select>
+        </div>
+        
+        <!-- Buttons -->
+        <div class="flex gap-2">
+            <button type="submit" class="px-6 py-2 bg-emerald-500 text-white font-semibold rounded-lg hover:bg-emerald-600 transition">
+                <i class="fas fa-search mr-2"></i>Cari
+            </button>
+            @if(request('search') || request('kategori_id'))
+            <a href="{{ route('manajer.bahan-baku.index') }}" class="px-6 py-2 bg-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-400 transition">
+                <i class="fas fa-redo mr-2"></i>Reset
+            </a>
+            @endif
+        </div>
+        
+    </form>
+</div>
+
+<!-- Active Filters Display -->
+@if(request('search') || request('kategori_id'))
+<div class="mb-4 flex items-center gap-2 text-sm">
+    <span class="text-gray-600">Filter aktif:</span>
+    @if(request('search'))
+    <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full">
+        <i class="fas fa-search mr-1"></i>{{ request('search') }}
+    </span>
+    @endif
+    @if(request('kategori_id'))
+    <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full">
+        <i class="fas fa-tag mr-1"></i>{{ $kategoris->find(request('kategori_id'))->nama_kategori ?? 'Kategori' }}
+    </span>
+    @endif
+</div>
+@endif
+
 <!-- Table Bahan Baku -->
 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
     
@@ -39,6 +113,7 @@
         <h3 class="text-lg font-bold text-gray-800">
             <i class="fas fa-list mr-2 text-emerald-600"></i>Daftar Bahan Baku
         </h3>
+        <p class="text-sm text-gray-600 mt-1">Total: {{ $bahanBakus->total() }} bahan baku</p>
     </div>
     
     <div class="overflow-x-auto">
@@ -98,7 +173,7 @@
                 <tr>
                     <td colspan="11" class="px-6 py-8 text-center text-gray-500">
                         <i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i>
-                        <p>Belum ada data bahan baku.</p>
+                        <p>{{ request('search') || request('kategori_id') ? 'Tidak ada hasil yang sesuai dengan pencarian.' : 'Belum ada data bahan baku.' }}</p>
                     </td>
                 </tr>
                 @endforelse
@@ -107,9 +182,11 @@
     </div>
     
     <!-- Pagination -->
+    @if($bahanBakus->hasPages())
     <div class="px-6 py-4 border-t border-gray-200">
-        {{ $bahanBakus->links() }}
+        {{ $bahanBakus->appends(request()->query())->links() }}
     </div>
+    @endif
     
 </div>
 

@@ -13,6 +13,14 @@
     <i class="fas fa-box w-5"></i>
     <span class="font-medium">Bahan Baku</span>
 </a>
+<a href="{{ route('manajer.ranking-saw') }}" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg mb-1 transition text-gray-600">
+    <i class="fas fa-trophy w-5"></i>
+    <span class="font-medium">Ranking SAW</span>
+</a>
+<a href="{{ route('manajer.peringatan-stok') }}" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg mb-1 transition text-gray-600">
+    <i class="fas fa-exclamation-triangle w-5"></i>
+    <span class="font-medium">Peringatan Stok</span>
+</a>
 <a href="{{ route('manajer.kategori.index') }}" class="sidebar-link sidebar-active flex items-center space-x-3 px-4 py-3 rounded-lg mb-1 transition">
     <i class="fas fa-tags w-5"></i>
     <span class="font-medium">Kategori</span>

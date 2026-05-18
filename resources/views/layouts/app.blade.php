@@ -7,6 +7,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'SPK Remaja Kuring') }} - @yield('title')</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -40,15 +43,9 @@
         <!-- Sidebar -->
         <aside class="w-64 bg-white border-r border-gray-200 flex flex-col">
             <!-- Logo -->
-            <div class="p-6 border-b border-gray-200">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-leaf text-white text-xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-lg font-bold text-gray-800">REMAJA KURING</h1>
-                        <p class="text-xs text-gray-500">Pengadaan Bahan Baku</p>
-                    </div>
+            <div class="p-4 border-b border-gray-200">
+                <div class="flex items-center justify-center">
+                    <img src="{{ asset('images/logo.png') }}" alt="Remaja Kuring" class="h-20 w-auto object-contain">
                 </div>
             </div>
 

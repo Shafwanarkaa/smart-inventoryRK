@@ -10,11 +10,22 @@ class OperasionalController extends Controller
     /**
      * Tampilkan daftar stok untuk update harian
      */
-    public function index()
+    public function index(Request $request)
     {
-        $bahanBakus = BahanBaku::with(['kategori', 'supplier'])
-            ->orderBy('nama_bahan')
-            ->paginate(15);
+        $query = BahanBaku::with(['kategori', 'supplier']);
+
+        // Filter berdasarkan kategori
+        if ($request->filled('kategori_id') && $request->kategori_id != '') {
+            $query->where('kategori_id', $request->kategori_id);
+        }
+
+        // Search berdasarkan nama bahan
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('nama_bahan', 'like', "%{$search}%");
+        }
+
+        $bahanBakus = $query->orderBy('nama_bahan')->paginate(20);
 
         return view('operasional.stok.index', compact('bahanBakus'));
     }
@@ -29,23 +40,24 @@ class OperasionalController extends Controller
     }
 
     /**
-     * Update stok harian
+     * Update stok harian (C1 otomatis = stok_saat_ini)
      */
     public function update(Request $request, $id)
-    {
-        $request->validate([
-            'stok_saat_ini' => 'required|integer|min:0',
-            'nilai_c1' => 'required|integer|min:0',
-        ]);
+{
+    $request->validate([
+        'stok_saat_ini' => 'required|integer|min:0',
+    ]);
 
-        $bahan = BahanBaku::findOrFail($id);
+    $bahan = BahanBaku::findOrFail($id);
+    
+    // Koki CUMA update stok_saat_ini
+    // C1, C2, C3 TIDAK DISENTUH (diurus Manajer)
+    $bahan->update([
+        'stok_saat_ini' => $request->stok_saat_ini,
+        // HAPUS: 'nilai_c1' => $request->stok_saat_ini,
+    ]);
 
-        $bahan->update([
-            'stok_saat_ini' => $request->stok_saat_ini,
-            'nilai_c1' => $request->nilai_c1,
-        ]);
-
-        return redirect()->route('operasional.stok')
-            ->with('success', 'Stok berhasil diperbarui untuk ' . $bahan->nama_bahan);
-    }
+    return redirect()->route('operasional.stok')
+        ->with('success', 'Stok berhasil diperbarui untuk ' . $bahan->nama_bahan);
+}
 }

@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Login - SPK Remaja Kuring</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -26,10 +29,9 @@
 
             <!-- Header -->
             <div class="bg-gradient-to-r from-emerald-500 to-teal-500 p-8 text-center">
-                <div class="w-20 h-20 bg-white rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <i class="fas fa-leaf text-emerald-500 text-3xl"></i>
+                <div class="flex items-center justify-center mb-4">
+                    <img src="{{ asset('images/logo.png') }}" alt="Remaja Kuring" class="h-28 w-auto object-contain drop-shadow-lg">
                 </div>
-                <h1 class="text-2xl font-bold text-white mb-2">REMAJA KURING</h1>
                 <p class="text-emerald-100 text-sm">Sistem Pendukung Keputusan Pengadaan Bahan Baku</p>
             </div>
 

@@ -34,19 +34,25 @@ Route::middleware(['auth', 'operasional'])->prefix('operasional')->name('operasi
 
 // ========================================
 // GROUP MANAJER
-// ========================================
 Route::middleware(['auth', 'manajer'])->prefix('manajer')->name('manajer.')->group(function () {
-
-    // Dashboard & Ranking SAW
+    
+    // Dashboard
     Route::get('/dashboard', [SpkController::class, 'dashboard'])->name('dashboard');
+    
+    // Ranking SAW (Halaman Baru)
+    Route::get('/ranking-saw', [SpkController::class, 'rankingSAW'])->name('ranking-saw');
     Route::post('/hitung-saw', [SpkController::class, 'hitungSAW'])->name('hitung-saw');
-
+    
+    // Peringatan Stok (Halaman Baru)
+    Route::get('/peringatan-stok', [SpkController::class, 'peringatanStok'])->name('peringatan-stok');
+    
     // CRUD Kategori
     Route::resource('kategori', KategoriController::class);
-
+    
     // CRUD Supplier
     Route::resource('supplier', SupplierController::class);
-
+    
     // CRUD Bahan Baku
     Route::resource('bahan-baku', BahanBakuController::class);
+    
 });
