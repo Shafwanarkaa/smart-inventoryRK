@@ -195,63 +195,66 @@
                         </div>
                     </div>
                     
-                    <!-- Nilai C2 (Tingkat Kadaluarsa) - Skala 1-5 -->
+                    <!-- Nilai C2 (Tingkat Kadaluarsa) -->
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                         <label for="nilai_c2" class="block text-sm font-semibold text-gray-800 mb-2">
                             <i class="fas fa-hourglass-half text-blue-600 mr-2"></i>C2 - Tingkat Kadaluarsa <span class="text-red-500">*</span>
                         </label>
                         <p class="text-xs text-gray-700 mb-3">
-                            Seberapa cepat bahan ini basi/rusak? Pilih skala 1–5.
+                            Seberapa cepat bahan ini basi/rusak? Nilai 1-10.
                         </p>
-                        <select 
+                        <input 
+                            type="number" 
                             name="nilai_c2" 
                             id="nilai_c2" 
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white"
+                            placeholder="Masukkan nilai 1-10"
+                            value="{{ old('nilai_c2', 5) }}"
+                            min="1"
+                            max="10"
                             required
                         >
-                            <option value="">-- Pilih Tingkat Kadaluarsa --</option>
-                            <option value="1" {{ old('nilai_c2') == '1' ? 'selected' : '' }}>1 — Sangat Tahan Lama (Beras, Gula, Minyak, Bumbu Kering)</option>
-                            <option value="2" {{ old('nilai_c2') == '2' ? 'selected' : '' }}>2 — Tahan Lama (Kentang, Bawang, Makanan Kaleng)</option>
-                            <option value="3" {{ old('nilai_c2') == '3' ? 'selected' : '' }}>3 — Sedang (Telur, Buah, Daging Beku)</option>
-                            <option value="4" {{ old('nilai_c2') == '4' ? 'selected' : '' }}>4 — Mudah Basi (Daging Segar, Tahu, Tempe)</option>
-                            <option value="5" {{ old('nilai_c2') == '5' ? 'selected' : '' }}>5 — Sangat Mudah Basi (Sayuran Hijau, Ikan, Susu Segar)</option>
-                        </select>
-                        <div class="mt-3 grid grid-cols-5 gap-1 text-xs text-center">
-                            <div class="bg-green-100 rounded p-1 border border-green-200"><span class="font-bold text-green-700">1</span><br>Sangat Tahan</div>
-                            <div class="bg-lime-100 rounded p-1 border border-lime-200"><span class="font-bold text-lime-700">2</span><br>Tahan</div>
-                            <div class="bg-yellow-100 rounded p-1 border border-yellow-200"><span class="font-bold text-yellow-700">3</span><br>Sedang</div>
-                            <div class="bg-orange-100 rounded p-1 border border-orange-200"><span class="font-bold text-orange-700">4</span><br>Mudah Basi</div>
-                            <div class="bg-red-100 rounded p-1 border border-red-200"><span class="font-bold text-red-700">5</span><br>Sangat Cepat</div>
+                        <div class="mt-3 grid grid-cols-3 gap-2 text-xs">
+                            <div class="bg-white rounded p-2 border border-gray-200">
+                                <p class="font-semibold text-red-600">1-3: Sangat Mudah Basi</p>
+                                <p class="text-gray-600">Contoh: Sayuran hijau, Ikan segar, Susu</p>
+                            </div>
+                            <div class="bg-white rounded p-2 border border-gray-200">
+                                <p class="font-semibold text-yellow-600">4-7: Sedang</p>
+                                <p class="text-gray-600">Contoh: Daging, Buah, Telur</p>
+                            </div>
+                            <div class="bg-white rounded p-2 border border-gray-200">
+                                <p class="font-semibold text-green-600">8-10: Tahan Lama</p>
+                                <p class="text-gray-600">Contoh: Beras, Gula, Minyak, Bumbu kering</p>
+                            </div>
                         </div>
                     </div>
                     
-                    <!-- Nilai C3 (Kebutuhan Harian) - Skala 1-5 -->
+                    <!-- Nilai C3 (Kebutuhan Harian) -->
                     <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
                         <label for="nilai_c3" class="block text-sm font-semibold text-gray-800 mb-2">
                             <i class="fas fa-utensils text-purple-600 mr-2"></i>C3 - Estimasi Kebutuhan Harian <span class="text-red-500">*</span>
                         </label>
                         <p class="text-xs text-gray-700 mb-3">
-                            Seberapa besar kebutuhan harian bahan ini? Pilih skala 1–5.
+                            Berapa banyak (dalam satuan yang sama) yang dibutuhkan per hari?
                         </p>
-                        <select 
+                        <input 
+                            type="number" 
                             name="nilai_c3" 
                             id="nilai_c3" 
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none bg-white"
+                            placeholder="Contoh: 5 (jika butuh 5 kg per hari)"
+                            value="{{ old('nilai_c3', 0) }}"
+                            min="0"
                             required
                         >
-                            <option value="">-- Pilih Tingkat Kebutuhan Harian --</option>
-                            <option value="1" {{ old('nilai_c3') == '1' ? 'selected' : '' }}>1 — Sangat Rendah (jarang dipakai, misal bumbu pelengkap)</option>
-                            <option value="2" {{ old('nilai_c3') == '2' ? 'selected' : '' }}>2 — Rendah (dipakai beberapa kali seminggu)</option>
-                            <option value="3" {{ old('nilai_c3') == '3' ? 'selected' : '' }}>3 — Sedang (dipakai setiap hari, jumlah normal)</option>
-                            <option value="4" {{ old('nilai_c3') == '4' ? 'selected' : '' }}>4 — Tinggi (kebutuhan besar setiap hari)</option>
-                            <option value="5" {{ old('nilai_c3') == '5' ? 'selected' : '' }}>5 — Sangat Tinggi (bahan utama, habis banyak tiap hari)</option>
-                        </select>
-                        <div class="mt-3 grid grid-cols-5 gap-1 text-xs text-center">
-                            <div class="bg-green-100 rounded p-1 border border-green-200"><span class="font-bold text-green-700">1</span><br>Sangat Rendah</div>
-                            <div class="bg-lime-100 rounded p-1 border border-lime-200"><span class="font-bold text-lime-700">2</span><br>Rendah</div>
-                            <div class="bg-yellow-100 rounded p-1 border border-yellow-200"><span class="font-bold text-yellow-700">3</span><br>Sedang</div>
-                            <div class="bg-orange-100 rounded p-1 border border-orange-200"><span class="font-bold text-orange-700">4</span><br>Tinggi</div>
-                            <div class="bg-purple-100 rounded p-1 border border-purple-200"><span class="font-bold text-purple-700">5</span><br>Sangat Tinggi</div>
+                        <div class="mt-3 bg-white rounded p-3 border border-gray-200">
+                            <p class="text-xs text-gray-700">
+                                <strong>Contoh:</strong><br>
+                                • Bawang Merah: 5 kg/hari → isi <strong>5</strong><br>
+                                • Kangkung: 10 ikat/hari → isi <strong>10</strong><br>
+                                • Minyak Goreng: 3 liter/hari → isi <strong>3</strong>
+                            </p>
                         </div>
                     </div>
                     
@@ -264,10 +267,10 @@
                     <i class="fas fa-lightbulb mr-2"></i>Catatan Penting
                 </h4>
                 <ul class="text-xs text-emerald-700 space-y-1">
-                    <li><strong>C1</strong> = angka threshold minimum stok (contoh: 10 kg)</li>
-                    <li><strong>C2 & C3</strong> = skala 1–5 yang dipilih Manajer (1=rendah, 5=tinggi)</li>
-                    <li><strong>Bobot SAW:</strong> C1 = 40%, C2 = 30%, C3 = 30%</li>
-                    <li>Semakin tinggi skor SAW = semakin prioritas untuk dibeli/diisi stok</li>
+                    <li><strong>C1, C2, dan C3</strong> diinput oleh Manajer saat menambah/edit bahan baku</li>
+                    <li><strong>Stok Saat Ini</strong> akan diupdate oleh Koki/Staff setiap hari</li>
+                    <li><strong>Bobot SAW:</strong> C1 = 80% (dominan), C2 = 10%, C3 = 10%</li>
+                    <li>Sistem akan sangat memprioritaskan bahan dengan stok mendekati batas minimum C1</li>
                 </ul>
             </div>
             

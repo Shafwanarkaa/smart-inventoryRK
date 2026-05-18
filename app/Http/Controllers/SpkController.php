@@ -8,15 +8,12 @@ use Illuminate\Support\Facades\DB;
 
 class SpkController extends Controller
 {
-    // Bobot kriteria SAW
+    // Bobot kriteria (BISA PAKAI APAPUN, misal 40-30-30 atau 80-10-10)
     const BOBOT = [
-        'w1' => 0.40, // C1: Sisa Stok / Threshold Minimum (COST)
-        'w2' => 0.30, // C2: Tingkat Kadaluarsa, skala 1-5 (BENEFIT) — 5=sangat mudah basi
-        'w3' => 0.30, // C3: Kebutuhan Harian, skala 1-5 (BENEFIT) — 5=kebutuhan sangat tinggi
+        'w1' => 0.40, // C1: Sisa Stok (COST)
+        'w2' => 0.30, // C2: Tingkat Kadaluarsa (BENEFIT)
+        'w3' => 0.30, // C3: Kebutuhan Harian (BENEFIT)
     ];
-
-    // Skala maksimum tetap untuk C2 dan C3 (skala 1-5)
-    const MAX_SKALA = 5;
 
     /**
      * Dashboard - Tampilkan Top 30 Peringatan Stok (Kritis & Rendah)
@@ -79,31 +76,22 @@ class SpkController extends Controller
                 return back()->with('error', 'Tidak ada data bahan baku untuk dihitung.');
             }
 
-            // Cari nilai min C1 untuk normalisasi COST
+            // Cari nilai min dan max untuk normalisasi
             $minC1 = $bahanBakus->min('nilai_c1');
+            $maxC2 = $bahanBakus->max('nilai_c2');
+            $maxC3 = $bahanBakus->max('nilai_c3');
 
-            if ($minC1 == 0) {
+            if ($minC1 == 0 || $maxC2 == 0 || $maxC3 == 0) {
                 DB::rollBack();
-                return back()->with('error', 'Nilai C1 tidak valid (ada yang bernilai 0).');
-            }
-
-            // Validasi C2 dan C3 harus dalam skala 1-5
-            $invalidC2 = $bahanBakus->filter(fn($b) => $b->nilai_c2 < 1 || $b->nilai_c2 > 5)->count();
-            $invalidC3 = $bahanBakus->filter(fn($b) => $b->nilai_c3 < 1 || $b->nilai_c3 > 5)->count();
-            if ($invalidC2 > 0 || $invalidC3 > 0) {
-                DB::rollBack();
-                return back()->with('error', 'Ada data C2 atau C3 yang di luar skala 1-5. Harap edit terlebih dahulu.');
+                return back()->with('error', 'Nilai C1, C2, atau C3 tidak valid (ada yang bernilai 0).');
             }
 
             // Proses normalisasi dan hitung skor SAW
             foreach ($bahanBakus as $bahan) {
-                // Normalisasi SAW:
-                // C1 = COST  → min/xi (semakin kecil stok vs threshold, makin prioritas)
-                // C2 = BENEFIT skala 1-5 → xi/MAX_SKALA (semakin mudah basi = makin tinggi = makin prioritas)
-                // C3 = BENEFIT skala 1-5 → xi/MAX_SKALA (semakin tinggi kebutuhan = makin prioritas)
-                $r1 = $minC1 / $bahan->nilai_c1;                // COST (dynamic min)
-                $r2 = $bahan->nilai_c2 / self::MAX_SKALA;       // BENEFIT (tetap /5)
-                $r3 = $bahan->nilai_c3 / self::MAX_SKALA;       // BENEFIT (tetap /5)
+                // Normalisasi
+                $r1 = $minC1 / $bahan->nilai_c1; // COST
+                $r2 = $bahan->nilai_c2 / $maxC2; // BENEFIT
+                $r3 = $bahan->nilai_c3 / $maxC3; // BENEFIT
 
                 // Hitung skor SAW ASLI (tanpa multiplier)
                 $skorSAW = (self::BOBOT['w1'] * $r1) + 
