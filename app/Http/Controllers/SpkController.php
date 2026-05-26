@@ -39,8 +39,7 @@ class SpkController extends Controller
     public function rankingSAW()
     {
         $bahanBakus = BahanBaku::with(['kategori', 'supplier'])
-            ->whereRaw('stok_saat_ini <= nilai_c1') // Hanya Kritis dan Rendah
-            ->orderBy('skor_saw', 'desc') // Sort by skor_saw
+            ->orderBy('skor_saw', 'desc') // Semua bahan diranking
             ->paginate(20);
 
         return view('manajer.ranking-saw', compact('bahanBakus'));
