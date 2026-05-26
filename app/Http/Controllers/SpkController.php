@@ -8,11 +8,11 @@ use Illuminate\Support\Facades\DB;
 
 class SpkController extends Controller
 {
-    // Bobot kriteria (BISA PAKAI APAPUN, misal 40-30-30 atau 80-10-10)
+    // Bobot kriteria SAW
     const BOBOT = [
         'w1' => 0.40, // C1: Sisa Stok (COST)
-        'w2' => 0.30, // C2: Tingkat Kadaluarsa (BENEFIT)
-        'w3' => 0.30, // C3: Kebutuhan Harian (BENEFIT)
+        'w2' => 0.30, // C2: Tingkat Kadaluarsa - skala 1-5 (BENEFIT)
+        'w3' => 0.30, // C3: Kebutuhan Harian - skala 1-5 (BENEFIT)
     ];
 
     /**
@@ -20,14 +20,15 @@ class SpkController extends Controller
      */
     public function dashboard()
     {
+        // Menampilkan bahan baku yang fisiknya Rendah atau Kritis (Stok <= Batas C1)
         $peringatanStok = BahanBaku::with(['kategori', 'supplier'])
-            ->whereRaw('stok_saat_ini <= 50')
-            ->orderBy('stok_saat_ini', 'asc')
+            ->whereRaw('stok_saat_ini <= nilai_c1')
+            ->orderByRaw('(stok_saat_ini / nilai_c1) ASC') // Urutkan dari rasio paling kritis
             ->take(30)
             ->get();
 
         $totalBahan = BahanBaku::count();
-        $jumlahPeringatan = BahanBaku::whereRaw('stok_saat_ini <= 50')->count();
+        $jumlahPeringatan = BahanBaku::whereRaw('stok_saat_ini <= nilai_c1')->count();
 
         return view('manajer.dashboard', compact('peringatanStok', 'totalBahan', 'jumlahPeringatan'));
     }
@@ -38,7 +39,8 @@ class SpkController extends Controller
     public function rankingSAW()
     {
         $bahanBakus = BahanBaku::with(['kategori', 'supplier'])
-            ->orderBy('skor_saw', 'desc') // Sort by skor_saw (yang sudah pakai multiplier)
+            ->whereRaw('stok_saat_ini <= nilai_c1') // Hanya Kritis dan Rendah
+            ->orderBy('skor_saw', 'desc') // Sort by skor_saw
             ->paginate(20);
 
         return view('manajer.ranking-saw', compact('bahanBakus'));
@@ -49,14 +51,9 @@ class SpkController extends Controller
      */
     public function peringatanStok()
     {
+        // Halaman Peringatan Stok (Menampilkan semua bahan, diurutkan dari yang paling kritis)
         $bahanBakus = BahanBaku::with(['kategori', 'supplier'])
-            ->whereRaw('stok_saat_ini <= 50')
-            ->orderByRaw("CASE 
-                WHEN stok_saat_ini <= 10 THEN 1
-                WHEN stok_saat_ini <= 50 THEN 2
-                ELSE 3
-            END")
-            ->orderBy('stok_saat_ini', 'asc')
+            ->orderByRaw('(stok_saat_ini / nilai_c1) ASC') // Urutkan dari rasio paling kritis
             ->paginate(20);
 
         return view('manajer.peringatan-stok', compact('bahanBakus'));
@@ -76,56 +73,47 @@ class SpkController extends Controller
                 return back()->with('error', 'Tidak ada data bahan baku untuk dihitung.');
             }
 
-            // Cari nilai min dan max untuk normalisasi
-            $minC1 = $bahanBakus->min('nilai_c1');
-            $maxC2 = $bahanBakus->max('nilai_c2');
-            $maxC3 = $bahanBakus->max('nilai_c3');
-
-            if ($minC1 == 0 || $maxC2 == 0 || $maxC3 == 0) {
-                DB::rollBack();
-                return back()->with('error', 'Nilai C1, C2, atau C3 tidak valid (ada yang bernilai 0).');
+            // Hitung rasio stok (Stok Saat Ini / Batas Minimum)
+            // Sifat: COST (makin kecil rasio = makin mendesak)
+            $rasioStoks = [];
+            foreach ($bahanBakus as $bahan) {
+                // Hindari division by zero
+                $batasMin = max(1, $bahan->nilai_c1);
+                $stok = $bahan->stok_saat_ini;
+                
+                // Jika stok habis (0), set rasio jadi sangat kecil (misal 0.01) agar bisa di-COST-kan
+                $rasio = ($stok <= 0) ? 0.01 : ($stok / $batasMin);
+                $rasioStoks[$bahan->id] = $rasio;
             }
+
+            // Nilai min rasio C1 untuk normalisasi COST
+            $minRasioC1 = min($rasioStoks);
+
+            // C2 dan C3 sekarang pakai skala 1-5 (fixed), max selalu = 5
+            $maxC2 = 5;
+            $maxC3 = 5;
 
             // Proses normalisasi dan hitung skor SAW
             foreach ($bahanBakus as $bahan) {
                 // Normalisasi
-                $r1 = $minC1 / $bahan->nilai_c1; // COST
+                $r1 = $minRasioC1 / $rasioStoks[$bahan->id]; // COST
                 $r2 = $bahan->nilai_c2 / $maxC2; // BENEFIT
                 $r3 = $bahan->nilai_c3 / $maxC3; // BENEFIT
 
-                // Hitung skor SAW ASLI (tanpa multiplier)
+                // Hitung skor SAW
                 $skorSAW = (self::BOBOT['w1'] * $r1) + 
                            (self::BOBOT['w2'] * $r2) + 
                            (self::BOBOT['w3'] * $r3);
 
-                // ========================================
-                // TAMBAHKAN MULTIPLIER BERDASARKAN STATUS
-                // ========================================
-                
-                $skorFinal = $skorSAW; // Default
-                
-                if ($bahan->stok_saat_ini <= 10) {
-                    // KRITIS: Dapat bonus +10 poin
-                    $skorFinal = $skorSAW + 10.0;
-                    
-                } elseif ($bahan->stok_saat_ini <= 50) {
-                    // RENDAH: Dapat bonus +5 poin
-                    $skorFinal = $skorSAW + 5.0;
-                    
-                } else {
-                    // AMAN: Tidak dapat bonus (+0)
-                    $skorFinal = $skorSAW + 0.0;
-                }
-
-                // Update skor FINAL ke database
+                // Simpan skor SAW ke database
                 $bahan->update([
-                    'skor_saw' => round($skorFinal, 4)
+                    'skor_saw' => round($skorSAW, 4)
                 ]);
             }
 
             DB::commit();
 
-            return back()->with('success', 'Perhitungan SAW berhasil! Ranking telah diperbarui dengan sistem multiplier (Kritis +10, Rendah +5, Aman +0).');
+            return back()->with('success', 'Perhitungan SAW berhasil! Ranking telah diperbarui.');
 
         } catch (\Exception $e) {
             DB::rollBack();

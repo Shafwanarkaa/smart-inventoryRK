@@ -100,7 +100,7 @@
 
                 </form>
 
-                <!-- Info Akun Demo -->
+                <!-- Info Akun Demo
                 <div class="mt-8 pt-6 border-t border-gray-200">
                     <p class="text-xs text-gray-500 text-center mb-3">Akun Demo:</p>
                     <div class="grid grid-cols-3 gap-2 text-xs">
@@ -117,7 +117,7 @@
                             <p class="text-gray-500">staff123</p>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
             </div>
 

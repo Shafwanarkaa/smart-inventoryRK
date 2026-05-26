@@ -42,14 +42,18 @@ class BahanBaku extends Model
         return $this->belongsTo(Supplier::class, 'supplier_id');
     }
 
-    // Helper untuk status stok
+    // Helper untuk status stok (Berubah berdasarkan Fisik Stok vs Batas Minimum)
     public function getStatusStokAttribute(): string
     {
-        if ($this->stok_saat_ini <= 10) {
+        // 🔴 KRITIS: Stok sisa separuh atau kurang dari batas minimum
+        if ($this->stok_saat_ini <= ($this->nilai_c1 / 2)) {
             return 'Kritis';
-        } elseif ($this->stok_saat_ini <= 50) {
+        } 
+        // 🟡 RENDAH: Stok di bawah atau sama dengan batas minimum
+        elseif ($this->stok_saat_ini <= $this->nilai_c1) {
             return 'Rendah';
         }
+        // 🟢 AMAN: Stok masih di atas batas minimum
         return 'Aman';
     }
 

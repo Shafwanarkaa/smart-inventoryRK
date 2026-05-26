@@ -124,15 +124,15 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
         <div class="flex items-center">
             <span class="px-3 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-full mr-3">Kritis</span>
-            <span class="text-gray-600">Stok ≤ 10 (Harus segera dibeli)</span>
+            <span class="text-gray-600">Stok ≤ 2 (Harus segera dibeli)</span>
         </div>
         <div class="flex items-center">
             <span class="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full mr-3">Rendah</span>
-            <span class="text-gray-600">Stok 11-50 (Perlu dipantau)</span>
+            <span class="text-gray-600">Stok 3-5 (Perlu dipantau)</span>
         </div>
         <div class="flex items-center">
             <span class="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full mr-3">Aman</span>
-            <span class="text-gray-600">Stok > 50 (Kondisi baik)</span>
+            <span class="text-gray-600">Stok > 6 (Kondisi baik)</span>
         </div>
     </div>
 </div>

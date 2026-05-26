@@ -64,6 +64,7 @@
                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Stok</th>
                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Skor SAW</th>
                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Saran Sistem</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
@@ -97,12 +98,21 @@
                             {{ $bahan->status_stok }}
                         </span>
                     </td>
+                    <td class="px-6 py-4">
+                        @if($rank <= 3)
+                            <span class="text-red-600 font-bold text-xs"><i class="fas fa-fire mr-1"></i>Wajib Beli Sekarang!</span>
+                        @elseif($rank <= 10)
+                            <span class="text-orange-500 font-bold text-xs"><i class="fas fa-shopping-cart mr-1"></i>Prioritas Hari Ini</span>
+                        @else
+                            <span class="text-gray-500 text-xs"><i class="fas fa-clock mr-1"></i>Bisa Ditunda / Cicil</span>
+                        @endif
+                    </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+                    <td colspan="8" class="px-6 py-8 text-center text-gray-500">
                         <i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i>
-                        <p>Belum ada data bahan baku.</p>
+                        <p>Belum ada data bahan baku yang perlu dibeli.</p>
                     </td>
                 </tr>
                 @endforelse
@@ -120,57 +130,47 @@
 <!-- Info Box SAW -->
 <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
     <h4 class="text-sm font-semibold text-blue-800 mb-3">
-        <i class="fas fa-info-circle mr-2"></i>Informasi Metode SAW dengan Multiplier
+        <i class="fas fa-info-circle mr-2"></i>Bagaimana Sistem SAW Mengurutkan Prioritas Belanja?
     </h4>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-blue-700 mb-4">
         <div>
-            <p class="font-semibold mb-1">C1 - Sisa Stok (COST)</p>
-            <p>Semakin kecil stok = prioritas lebih tinggi</p>
+            <p class="font-semibold mb-1">C1 - Urgensi Stok (COST)</p>
+            <p>Semakin mepet sisa stok terhadap batas minimumnya, poin semakin besar.</p>
             <p class="text-blue-600 mt-1">Bobot: 40%</p>
         </div>
         <div>
             <p class="font-semibold mb-1">C2 - Tingkat Kadaluarsa (BENEFIT)</p>
-            <p>Semakin mudah basi = prioritas lebih tinggi</p>
+            <p>Bahan yang sangat mudah basi (skala 5) akan diprioritaskan untuk dibeli.</p>
             <p class="text-blue-600 mt-1">Bobot: 30%</p>
         </div>
         <div>
             <p class="font-semibold mb-1">C3 - Kebutuhan Harian (BENEFIT)</p>
-            <p>Semakin banyak kebutuhan = prioritas lebih tinggi</p>
+            <p>Bahan utama masakan (skala 5) akan diprioritaskan dibanding bumbu pelengkap.</p>
             <p class="text-blue-600 mt-1">Bobot: 30%</p>
         </div>
     </div>
     
     <div class="border-t border-blue-200 pt-4">
         <h5 class="font-semibold text-blue-800 mb-2">
-            <i class="fas fa-star mr-2"></i>Sistem Multiplier Status
+            <i class="fas fa-question-circle mr-2"></i>Pertanyaan Sering Diajukan (FAQ)
         </h5>
-        <div class="grid grid-cols-3 gap-3">
-            <div class="bg-red-50 border border-red-200 rounded p-3">
-                <p class="font-bold text-red-600 text-sm">🔴 KRITIS</p>
-                <p class="text-xs text-red-700 mt-1">Stok ≤ 10</p>
-                <p class="text-xs text-red-800 font-semibold mt-1">Bonus: +10 poin</p>
+        
+        <div class="space-y-3 mt-3">
+            <div class="bg-white rounded p-3 border border-blue-100">
+                <p class="font-bold text-blue-800 text-xs mb-1">Q: Kemana perginya bahan baku yang statusnya AMAN?</p>
+                <p class="text-xs text-blue-700">A: Bahan baku yang stoknya masih di atas batas minimum (Aman) **sengaja disembunyikan** dari daftar ini agar Manajer bisa fokus melihat rekomendasi bahan yang benar-benar butuh dibeli hari ini.</p>
             </div>
-            <div class="bg-yellow-50 border border-yellow-200 rounded p-3">
-                <p class="font-bold text-yellow-600 text-sm">🟡 RENDAH</p>
-                <p class="text-xs text-yellow-700 mt-1">Stok 11-50</p>
-                <p class="text-xs text-yellow-800 font-semibold mt-1">Bonus: +5 poin</p>
+            
+            <div class="bg-white rounded p-3 border border-blue-100">
+                <p class="font-bold text-blue-800 text-xs mb-1">Q: Kenapa status 'Rendah' bisa berada di atas status 'Kritis'?</p>
+                <p class="text-xs text-blue-700">A: Karena sistem SPK itu cerdas! Sistem ini tidak hanya melihat sisa stok secara buta. Jika ada Daging (Rendah) dan Garam (Kritis), sistem akan memaksa Daging naik ke ranking atas karena daging lebih cepat busuk (C2) dan krusial untuk menu masakan (C3). Inilah fungsi dari Sistem Pendukung Keputusan.</p>
             </div>
-            <div class="bg-green-50 border border-green-200 rounded p-3">
-                <p class="font-bold text-green-600 text-sm">🟢 AMAN</p>
-                <p class="text-xs text-green-700 mt-1">Stok > 50</p>
-                <p class="text-xs text-green-800 font-semibold mt-1">Bonus: +0 poin</p>
+            
+            <div class="bg-white rounded p-3 border border-blue-100">
+                <p class="font-bold text-blue-800 text-xs mb-1">Q: Apa bedanya halaman ini dengan Peringatan Stok?</p>
+                <p class="text-xs text-blue-700">A: Peringatan Stok hanya laporan fisik dari dapur (mana barang yang mau habis). Ranking SAW adalah rekomendasi untuk Manajer Pembelian (mana barang yang paling wajib dibeli pakai uang sekarang).</p>
             </div>
         </div>
-    </div>
-    
-    <div class="mt-4 pt-4 border-t border-blue-200">
-        <p class="text-xs text-blue-800">
-            <i class="fas fa-lightbulb mr-2"></i>
-            <strong>Cara Kerja:</strong> Sistem menghitung skor SAW normal (0-1), lalu menambahkan bonus berdasarkan status stok. 
-            Dengan cara ini, semua bahan dengan status KRITIS akan memiliki skor 10.xx (rank 1-20), 
-            RENDAH akan skor 5.xx (rank 21-60), dan AMAN akan skor 0.xx (rank 61-98).
-            <strong class="text-blue-900">Dijamin 100% tidak akan kebalik!</strong>
-        </p>
     </div>
 </div>
 @endsection
