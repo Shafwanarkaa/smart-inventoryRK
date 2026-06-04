@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('username')->unique();
             $table->string('password');
-            $table->enum('role', ['koki', 'staff', 'manajer'])->default('staff');
+            $table->enum('role', ['manajer', 'koki', 'staff'])->default('staff');
             $table->rememberToken();
             $table->timestamps();
         });

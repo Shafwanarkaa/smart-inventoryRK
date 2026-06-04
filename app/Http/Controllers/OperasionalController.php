@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\BahanBaku;
+use App\Models\HistoriStok;
+use Illuminate\Support\Facades\Auth;
 
 class OperasionalController extends Controller
 {
@@ -14,12 +16,10 @@ class OperasionalController extends Controller
     {
         $query = BahanBaku::with(['kategori', 'supplier']);
 
-        // Filter berdasarkan kategori
         if ($request->filled('kategori_id') && $request->kategori_id != '') {
             $query->where('kategori_id', $request->kategori_id);
         }
 
-        // Search berdasarkan nama bahan
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where('nama_bahan', 'like', "%{$search}%");
@@ -40,24 +40,34 @@ class OperasionalController extends Controller
     }
 
     /**
-     * Update stok harian (C1 otomatis = stok_saat_ini)
+     * Update stok harian + catat histori
      */
     public function update(Request $request, $id)
-{
-    $request->validate([
-        'stok_saat_ini' => 'required|integer|min:0',
-    ]);
+    {
+        $request->validate([
+            'stok_saat_ini' => 'required|integer|min:0',
+            'keterangan'    => 'nullable|string|max:200',
+        ]);
 
-    $bahan = BahanBaku::findOrFail($id);
-    
-    // Koki CUMA update stok_saat_ini
-    // C1, C2, C3 TIDAK DISENTUH (diurus Manajer)
-    $bahan->update([
-        'stok_saat_ini' => $request->stok_saat_ini,
-        // HAPUS: 'nilai_c1' => $request->stok_saat_ini,
-    ]);
+        $bahan        = BahanBaku::findOrFail($id);
+        $stokSebelum  = $bahan->stok_saat_ini;
+        $stokSesudah  = $request->stok_saat_ini;
+        $selisih      = $stokSesudah - $stokSebelum;
 
-    return redirect()->route('operasional.stok')
-        ->with('success', 'Stok berhasil diperbarui untuk ' . $bahan->nama_bahan);
-}
+        // Update stok
+        $bahan->update(['stok_saat_ini' => $stokSesudah]);
+
+        // Catat histori (selalu dicatat, termasuk jika tidak berubah)
+        HistoriStok::create([
+            'bahan_baku_id' => $bahan->id,
+            'user_id'       => Auth::id(),
+            'stok_sebelum'  => $stokSebelum,
+            'stok_sesudah'  => $stokSesudah,
+            'selisih'       => $selisih,
+            'keterangan'    => $request->keterangan,
+        ]);
+
+        return redirect()->route('operasional.stok')
+            ->with('success', "Stok {$bahan->nama_bahan} berhasil diperbarui ({$stokSebelum} → {$stokSesudah}).");
+    }
 }

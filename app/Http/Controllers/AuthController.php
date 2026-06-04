@@ -43,10 +43,10 @@ class AuthController extends Controller
     private function redirectByRole($user)
     {
         if ($user->isManajer()) {
-            return redirect()->intended(route('manajer.dashboard'));
+            return redirect()->route('manajer.dashboard');
         }
 
-        return redirect()->intended(route('operasional.stok'));
+        return redirect()->route('operasional.stok');
     }
 
     // Logout

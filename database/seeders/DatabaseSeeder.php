@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\Kategori;
+use App\Models\Kategori;    
 use App\Models\Supplier;
 use App\Models\BahanBaku;
 use Illuminate\Database\Seeder;

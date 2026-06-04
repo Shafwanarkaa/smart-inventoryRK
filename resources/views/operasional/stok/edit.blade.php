@@ -93,6 +93,21 @@
                 </div>
             </div>
             
+            <!-- Keterangan (opsional) -->
+            <div>
+                <label for="keterangan" class="block text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-sticky-note text-gray-400 mr-2"></i>Keterangan <span class="font-normal text-gray-400">(opsional)</span>
+                </label>
+                <input
+                    type="text"
+                    name="keterangan"
+                    id="keterangan"
+                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
+                    placeholder="Contoh: Beli dari pasar, Terpakai masak siang, Stok baru datang..."
+                    value="{{ old('keterangan') }}"
+                    maxlength="200">
+            </div>
+
             <!-- Buttons -->
             <div class="flex items-center space-x-3">
                 <button type="submit" class="flex-1 px-6 py-3 bg-emerald-500 text-white font-bold text-lg rounded-lg hover:bg-emerald-600 transition shadow-lg hover:shadow-xl">

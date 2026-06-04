@@ -29,6 +29,12 @@
     <i class="fas fa-truck w-5"></i>
     <span class="font-medium">Supplier</span>
 </a>
+<div class="mt-2 pt-2 border-t border-gray-200">
+    <a href="{{ route('manajer.users.index') }}" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg mb-1 transition text-gray-600">
+        <i class="fas fa-users w-5"></i>
+        <span class="font-medium">Kelola User</span>
+    </a>
+</div>
 @endsection
 
 @section('content')

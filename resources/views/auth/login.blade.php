@@ -74,13 +74,20 @@
                         <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">
                             <i class="fas fa-lock mr-2 text-gray-400"></i>Password
                         </label>
-                        <input
-                            type="password"
-                            name="password"
-                            id="password"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition"
-                            placeholder="Masukkan password"
-                            required>
+                        <div class="relative">
+                            <input
+                                type="password"
+                                name="password"
+                                id="password"
+                                class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition"
+                                placeholder="Masukkan password"
+                                required>
+                            <button type="button" onclick="togglePassword()"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-emerald-600 transition-colors p-1"
+                                title="Tampilkan / Sembunyikan password">
+                                <i id="eye-icon" class="fas fa-eye text-lg"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Remember Me -->
@@ -131,5 +138,17 @@
     </div>
 
 </body>
+
+<script>
+    function togglePassword() {
+        const input   = document.getElementById('password');
+        const icon    = document.getElementById('eye-icon');
+        const isHidden = input.type === 'password';
+
+        input.type = isHidden ? 'text' : 'password';
+        icon.classList.toggle('fa-eye',      !isHidden);
+        icon.classList.toggle('fa-eye-slash', isHidden);
+    }
+</script>
 
 </html>
