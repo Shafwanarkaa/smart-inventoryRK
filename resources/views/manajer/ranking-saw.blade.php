@@ -105,9 +105,9 @@
                         </span>
                     </td>
                     <td class="px-6 py-4">
-                        @if($rank <= 3)
-                            <span class="text-red-600 font-bold text-xs"><i class="fas fa-fire mr-1"></i>Wajib Beli Sekarang!</span>
-                        @elseif($rank <= 10)
+                        @if($bahan->skor_saw >= 0.6)
+                            <span class="text-red-600 font-bold text-xs"><i class="fas fa-fire mr-1"></i>Beli Segera</span>
+                        @elseif($bahan->skor_saw >= 0.5)
                             <span class="text-orange-500 font-bold text-xs"><i class="fas fa-shopping-cart mr-1"></i>Prioritas Hari Ini</span>
                         @else
                             <span class="text-gray-500 text-xs"><i class="fas fa-clock mr-1"></i>Bisa Ditunda / Cicil</span>
