@@ -15,22 +15,18 @@ class SpkController extends Controller
         'w3' => 0.30, // C3: Kebutuhan Harian - skala 1-5 (BENEFIT)
     ];
 
-    /**
-     * Dashboard - Tampilkan Top 30 Peringatan Stok (Kritis & Rendah)
-     */
     public function dashboard()
     {
-        // Menampilkan bahan baku yang fisiknya Rendah atau Kritis (Stok <= Batas C1)
-        $peringatanStok = BahanBaku::with(['kategori', 'supplier'])
-            ->whereRaw('stok_saat_ini <= nilai_c1')
-            ->orderByRaw('(stok_saat_ini / nilai_c1) ASC') // Urutkan dari rasio paling kritis
-            ->take(30)
+        // Menampilkan top 10 bahan baku berdasarkan hasil perhitungan SAW tertinggi
+        $rankingSAW = BahanBaku::with(['kategori', 'supplier'])
+            ->orderBy('skor_saw', 'desc') // Urutkan dari skor SAW tertinggi
+            ->take(10)
             ->get();
 
         $totalBahan = BahanBaku::count();
-        $jumlahPeringatan = BahanBaku::whereRaw('stok_saat_ini <= nilai_c1')->count();
+        $jumlahTelahDihitung = BahanBaku::whereNotNull('skor_saw')->count();
 
-        return view('manajer.dashboard', compact('peringatanStok', 'totalBahan', 'jumlahPeringatan'));
+        return view('manajer.dashboard', compact('rankingSAW', 'totalBahan', 'jumlahTelahDihitung'));
     }
 
     /**
