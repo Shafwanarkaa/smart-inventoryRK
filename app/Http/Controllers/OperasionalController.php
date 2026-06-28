@@ -40,34 +40,42 @@ class OperasionalController extends Controller
     }
 
     /**
-     * Update stok harian + catat histori
+     * Catat pemakaian harian (stok berkurang)
      */
     public function update(Request $request, $id)
     {
+        $bahan = BahanBaku::findOrFail($id);
+
         $request->validate([
-            'stok_saat_ini' => 'required|integer|min:0',
-            'keterangan'    => 'nullable|string|max:200',
+            'jumlah_pemakaian' => [
+                'required', 'integer', 'min:1',
+                "max:{$bahan->stok_saat_ini}",
+            ],
+            'keterangan' => 'nullable|string|max:200',
+        ], [
+            'jumlah_pemakaian.max' => "Jumlah pemakaian tidak boleh melebihi stok tersedia ({$bahan->stok_saat_ini} {$bahan->satuan}).",
+            'jumlah_pemakaian.min' => 'Jumlah pemakaian minimal 1.',
         ]);
 
-        $bahan        = BahanBaku::findOrFail($id);
         $stokSebelum  = $bahan->stok_saat_ini;
-        $stokSesudah  = $request->stok_saat_ini;
-        $selisih      = $stokSesudah - $stokSebelum;
+        $jumlah       = (int) $request->jumlah_pemakaian;
+        $stokSesudah  = $stokSebelum - $jumlah;
 
-        // Update stok
+        // Kurangi stok
         $bahan->update(['stok_saat_ini' => $stokSesudah]);
 
-        // Catat histori (selalu dicatat, termasuk jika tidak berubah)
+        // Catat histori dengan tipe 'pemakaian'
         HistoriStok::create([
             'bahan_baku_id' => $bahan->id,
             'user_id'       => Auth::id(),
             'stok_sebelum'  => $stokSebelum,
             'stok_sesudah'  => $stokSesudah,
-            'selisih'       => $selisih,
+            'selisih'       => -$jumlah,
+            'tipe'          => 'pemakaian',
             'keterangan'    => $request->keterangan,
         ]);
 
         return redirect()->route('operasional.stok')
-            ->with('success', "Stok {$bahan->nama_bahan} berhasil diperbarui ({$stokSebelum} → {$stokSesudah}).");
+            ->with('success', "Pemakaian {$bahan->nama_bahan} berhasil dicatat. Stok: {$stokSebelum} → {$stokSesudah} {$bahan->satuan}.");
     }
 }

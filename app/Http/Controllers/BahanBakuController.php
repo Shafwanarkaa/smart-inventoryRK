@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\BahanBaku;
+use App\Models\HistoriStok;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BahanBakuController extends Controller
 {
@@ -98,5 +100,41 @@ class BahanBakuController extends Controller
 
         return redirect()->route('manajer.bahan-baku.index')
                          ->with('success', 'Bahan baku berhasil dihapus.');
+    }
+
+    /**
+     * Manajer tambah stok pembelian (stok bertambah)
+     */
+    public function tambahStok(Request $request, $id)
+    {
+        $bahan = BahanBaku::findOrFail($id);
+
+        $request->validate([
+            'jumlah_pembelian' => 'required|integer|min:1',
+            'keterangan'       => 'nullable|string|max:200',
+        ], [
+            'jumlah_pembelian.min' => 'Jumlah pembelian minimal 1.',
+        ]);
+
+        $stokSebelum = $bahan->stok_saat_ini;
+        $jumlah      = (int) $request->jumlah_pembelian;
+        $stokSesudah = $stokSebelum + $jumlah;
+
+        // Tambah stok
+        $bahan->update(['stok_saat_ini' => $stokSesudah]);
+
+        // Catat histori dengan tipe 'pembelian'
+        HistoriStok::create([
+            'bahan_baku_id' => $bahan->id,
+            'user_id'       => Auth::id(),
+            'stok_sebelum'  => $stokSebelum,
+            'stok_sesudah'  => $stokSesudah,
+            'selisih'       => +$jumlah,
+            'tipe'          => 'pembelian',
+            'keterangan'    => $request->keterangan,
+        ]);
+
+        return redirect()->route('manajer.bahan-baku.index')
+            ->with('success', "Pembelian {$bahan->nama_bahan} berhasil dicatat. Stok: {$stokSebelum} → {$stokSesudah} {$bahan->satuan}.");
     }
 }

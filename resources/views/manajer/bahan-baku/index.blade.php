@@ -21,6 +21,10 @@
     <i class="fas fa-exclamation-triangle w-5"></i>
     <span class="font-medium">Peringatan Stok</span>
 </a>
+<a href="{{ route('manajer.histori-stok') }}" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg mb-1 transition text-gray-600">
+    <i class="fas fa-history w-5"></i>
+    <span class="font-medium">Histori Stok</span>
+</a>
 <a href="{{ route('manajer.kategori.index') }}" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg mb-1 transition text-gray-600">
     <i class="fas fa-tags w-5"></i>
     <span class="font-medium">Kategori</span>
@@ -162,13 +166,17 @@
                     </td>
                     <td class="px-6 py-4 text-center">
                         <div class="flex items-center justify-center space-x-2">
-                            <a href="{{ route('manajer.bahan-baku.edit', $bahan->id) }}" class="px-3 py-1.5 bg-blue-500 text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition">
+                            <button onclick="openModalPembelian({{ $bahan->id }}, '{{ $bahan->nama_bahan }}', {{ $bahan->stok_saat_ini }}, '{{ $bahan->satuan }}')"
+                                class="px-3 py-1.5 bg-green-500 text-white text-sm font-medium rounded-lg hover:bg-green-600 transition" title="Tambah Stok Pembelian">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <a href="{{ route('manajer.bahan-baku.edit', $bahan->id) }}" class="px-3 py-1.5 bg-blue-500 text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <form action="{{ route('manajer.bahan-baku.destroy', $bahan->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus bahan baku ini?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="px-3 py-1.5 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 transition">
+                                <button type="submit" class="px-3 py-1.5 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 transition" title="Hapus">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </form>
@@ -195,5 +203,86 @@
     @endif
     
 </div>
+
+<!-- Modal Tambah Stok Pembelian -->
+<div id="modal-pembelian" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 rounded-t-xl flex items-center justify-between">
+            <div>
+                <h3 class="text-lg font-bold text-gray-800">
+                    <i class="fas fa-shopping-cart text-green-600 mr-2"></i>Tambah Stok Pembelian
+                </h3>
+                <p id="modal-nama-bahan" class="text-sm text-gray-600 mt-0.5"></p>
+            </div>
+            <button onclick="closeModalPembelian()" class="text-gray-400 hover:text-gray-600 transition">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        <form id="form-pembelian" method="POST" class="p-6 space-y-4">
+            @csrf
+            <!-- Info stok saat ini -->
+            <div class="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center justify-between">
+                <span class="text-sm text-green-700">Stok Saat Ini:</span>
+                <span id="modal-stok-sekarang" class="font-bold text-green-700 text-lg"></span>
+            </div>
+            <!-- Input pembelian -->
+            <div>
+                <label for="jumlah_pembelian" class="block text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-plus-circle text-green-600 mr-1"></i>Jumlah Pembelian <span class="text-red-500">*</span>
+                </label>
+                <input type="number" name="jumlah_pembelian" id="jumlah_pembelian" min="1"
+                    class="w-full px-4 py-3 text-xl border-2 border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none text-center font-bold"
+                    placeholder="0" required>
+            </div>
+            <!-- Preview stok setelah pembelian -->
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 flex items-center justify-between">
+                <span class="text-sm text-gray-600">Stok Setelah Pembelian:</span>
+                <span id="modal-preview-stok" class="font-bold text-blue-700 text-lg">-</span>
+            </div>
+            <!-- Keterangan -->
+            <div>
+                <label for="keterangan_pembelian" class="block text-sm font-semibold text-gray-700 mb-2">Keterangan (opsional)</label>
+                <input type="text" name="keterangan" id="keterangan_pembelian"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 outline-none"
+                    placeholder="Contoh: Beli dari supplier, datang 50 kg..." maxlength="200">
+            </div>
+            <!-- Tombol -->
+            <div class="flex space-x-3 pt-2">
+                <button type="submit" class="flex-1 px-4 py-3 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition">
+                    <i class="fas fa-check mr-2"></i>Simpan Pembelian
+                </button>
+                <button type="button" onclick="closeModalPembelian()" class="px-4 py-3 bg-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-400 transition">
+                    Batal
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    let stokSaatIni = 0;
+
+    function openModalPembelian(id, nama, stok, satuan) {
+        stokSaatIni = stok;
+        document.getElementById('modal-nama-bahan').textContent = nama;
+        document.getElementById('modal-stok-sekarang').textContent = stok + ' ' + satuan;
+        document.getElementById('modal-preview-stok').textContent = stok + ' ' + satuan;
+        document.getElementById('jumlah_pembelian').value = '';
+        document.getElementById('keterangan_pembelian').value = '';
+        document.getElementById('form-pembelian').action = '/manajer/bahan-baku/' + id + '/tambah-stok';
+        document.getElementById('modal-pembelian').classList.remove('hidden');
+    }
+
+    function closeModalPembelian() {
+        document.getElementById('modal-pembelian').classList.add('hidden');
+    }
+
+    document.getElementById('jumlah_pembelian').addEventListener('input', function() {
+        const jumlah = parseInt(this.value) || 0;
+        const preview = document.getElementById('modal-preview-stok');
+        const satuanText = document.getElementById('modal-stok-sekarang').textContent.split(' ').slice(1).join(' ');
+        preview.textContent = (stokSaatIni + jumlah) + ' ' + satuanText;
+    });
+</script>
 
 @endsection

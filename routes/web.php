@@ -70,6 +70,12 @@ Route::middleware(['auth', 'manajer'])->prefix('manajer')->name('manajer.')->gro
     // Kelola User (Manajer)
     Route::resource('users', UserController::class)->except(['show']);
 
-    // Histori Transaksi Stok (sementara disembunyikan)
-    // Route::get('/histori-stok', [HistoriStokController::class, 'index'])->name('histori-stok');
+    // Histori Transaksi Stok
+    Route::get('/histori-stok', [HistoriStokController::class, 'index'])->name('histori-stok');
+    Route::get('/histori-stok/export-excel', [HistoriStokController::class, 'exportExcel'])->name('histori-stok.export-excel');
+    Route::get('/histori-stok/export-pdf', [HistoriStokController::class, 'exportPdf'])->name('histori-stok.export-pdf');
+    Route::delete('/histori-stok/reset', [HistoriStokController::class, 'resetHistori'])->name('histori-stok.reset');
+
+    // Tambah Stok Pembelian (Manajer)
+    Route::post('/bahan-baku/{id}/tambah-stok', [BahanBakuController::class, 'tambahStok'])->name('bahan-baku.tambah-stok');
 });

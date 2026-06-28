@@ -15,6 +15,7 @@ class HistoriStok extends Model
         'stok_sebelum',
         'stok_sesudah',
         'selisih',
+        'tipe',
         'keterangan',
     ];
 

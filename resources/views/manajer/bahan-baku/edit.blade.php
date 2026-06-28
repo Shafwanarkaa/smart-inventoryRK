@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Edit Bahan Baku')
 @section('page-title', 'Edit Bahan Baku')
@@ -20,6 +20,10 @@
 <a href="{{ route('manajer.peringatan-stok') }}" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg mb-1 transition text-gray-600">
     <i class="fas fa-exclamation-triangle w-5"></i>
     <span class="font-medium">Peringatan Stok</span>
+</a>
+<a href="{{ route('manajer.histori-stok') }}" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg mb-1 transition text-gray-600">
+    <i class="fas fa-history w-5"></i>
+    <span class="font-medium">Histori Stok</span>
 </a>
 <a href="{{ route('manajer.kategori.index') }}" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg mb-1 transition text-gray-600">
     <i class="fas fa-tags w-5"></i>

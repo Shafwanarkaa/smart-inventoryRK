@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Update Stok Harian')
-@section('page-title', 'Update Stok Harian')
+@section('title', 'Update Stok Pemakaian Bahan Baku')
+@section('page-title', 'Update Stok Pemakaian Bahan Baku')
 @section('page-subtitle', 'Kelola data sisa stok bahan baku.')
 
 @section('sidebar')
