@@ -127,7 +127,7 @@
             <p class="font-semibold mb-1">Catatan Penting</p>
             <ul class="space-y-1 list-disc list-inside text-amber-700">
                 <li>Akun yang sedang aktif (Anda) tidak bisa dihapus</li>
-                <li>Perubahan password langsung berlaku — beritahu user yang bersangkutan</li>
+                <li>Perubahan password langsung berlaku beritahu user yang bersangkutan</li>
                 <li>Role <strong>Super Admin</strong> memiliki akses penuh ke seluruh sistem</li>
             </ul>
         </div>
